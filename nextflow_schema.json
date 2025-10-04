@@ -1,0 +1,135 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "https://raw.githubusercontent.com/tylergross97/sample_pipelines_for_conversion/main/nextflow_schema.json",
+    "title": "RNA-seq Pipeline Parameters",
+    "description": "Minimal RNA-seq analysis pipeline: FastQC -> STAR -> featureCounts",
+    "type": "object",
+    "definitions": {
+        "input_output_options": {
+            "title": "Input/Output Options",
+            "type": "object",
+            "description": "Define where the pipeline should find input data and save output data",
+            "required": ["read1", "read2", "star_index", "annotation_gtf"],
+            "properties": {
+                "read1": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Path to R1 FASTQ file (gzipped)",
+                    "help_text": "Path to the first read of paired-end FASTQ files. Must be gzipped."
+                },
+                "read2": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Path to R2 FASTQ file (gzipped)",
+                    "help_text": "Path to the second read of paired-end FASTQ files. Must be gzipped."
+                },
+                "star_index": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "description": "Path to STAR index directory",
+                    "help_text": "Directory containing STAR genome index files."
+                },
+                "annotation_gtf": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Path to GTF annotation file",
+                    "help_text": "Gene annotation file in GTF format for quantification."
+                },
+                "sample_name": {
+                    "type": "string",
+                    "default": "sample1",
+                    "description": "Sample identifier",
+                    "help_text": "Name to use for sample output files."
+                },
+                "outdir": {
+                    "type": "string",
+                    "default": "results",
+                    "description": "Output directory",
+                    "help_text": "The output directory where the results will be saved."
+                }
+            }
+        },
+        "pipeline_options": {
+            "title": "Pipeline Options",
+            "type": "object",
+            "description": "Options to control pipeline behavior",
+            "properties": {
+                "skip_fastqc": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Skip FastQC step",
+                    "help_text": "If set to true, quality control with FastQC will be skipped."
+                }
+            }
+        },
+        "resource_options": {
+            "title": "Resource Options",
+            "type": "object",
+            "description": "Options to control computational resources",
+            "properties": {
+                "max_cpus": {
+                    "type": "integer",
+                    "default": 4,
+                    "description": "Maximum CPUs to use",
+                    "help_text": "Maximum number of CPUs that can be requested for any single process."
+                },
+                "max_memory": {
+                    "type": "string",
+                    "default": "8.GB",
+                    "description": "Maximum memory to use",
+                    "help_text": "Maximum amount of memory that can be requested for any single process.",
+                    "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$"
+                },
+                "max_time": {
+                    "type": "string",
+                    "default": "6.h",
+                    "description": "Maximum time per process",
+                    "help_text": "Maximum amount of time that can be requested for any single process.",
+                    "pattern": "^(\\d+\\.?\\s*(s|m|h|d|day)\\s*)+$"
+                }
+            }
+        },
+        "generic_options": {
+            "title": "Generic Options",
+            "type": "object",
+            "description": "Less common options for the pipeline",
+            "properties": {
+                "help": {
+                    "type": "boolean",
+                    "description": "Display help text",
+                    "hidden": true
+                },
+                "version": {
+                    "type": "boolean",
+                    "description": "Display version and exit",
+                    "hidden": true
+                },
+                "validate_params": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Boolean whether to validate parameters against the schema at runtime",
+                    "hidden": true
+                },
+                "show_hidden_params": {
+                    "type": "boolean",
+                    "description": "Show all params when using `--help`",
+                    "hidden": true
+                }
+            }
+        }
+    },
+    "allOf": [
+        {
+            "$ref": "#/definitions/input_output_options"
+        },
+        {
+            "$ref": "#/definitions/pipeline_options"
+        },
+        {
+            "$ref": "#/definitions/resource_options"
+        },
+        {
+            "$ref": "#/definitions/generic_options"
+        }
+    ]
+}
