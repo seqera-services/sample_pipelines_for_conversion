@@ -1,0 +1,87 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "https://raw.githubusercontent.com/tylergross97/sample_pipelines_for_conversion/master/nextflow_schema.json",
+    "title": "RNA-seq Pipeline Parameters",
+    "description": "Minimal RNA-seq pipeline: FastQC -> STAR -> featureCounts",
+    "type": "object",
+    "definitions": {
+        "input_output_options": {
+            "title": "Input/Output Options",
+            "type": "object",
+            "description": "Define where the pipeline should find input data and save output data.",
+            "required": ["read1", "read2", "sample_name", "star_index", "annotation_gtf"],
+            "properties": {
+                "read1": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Path to R1 FASTQ file (gzipped)",
+                    "help_text": "Forward read file in FASTQ format (compressed with gzip)."
+                },
+                "read2": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Path to R2 FASTQ file (gzipped)",
+                    "help_text": "Reverse read file in FASTQ format (compressed with gzip)."
+                },
+                "sample_name": {
+                    "type": "string",
+                    "description": "Sample identifier",
+                    "help_text": "Name used to identify this sample in output files.",
+                    "default": "sample"
+                },
+                "star_index": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Path to STAR index (tar.gz format)",
+                    "help_text": "Pre-built STAR genome index compressed as a tar.gz file."
+                },
+                "annotation_gtf": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Path to GTF annotation file",
+                    "help_text": "Gene annotation file in GTF format for feature counting."
+                },
+                "outdir": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "description": "Output directory",
+                    "default": "./results",
+                    "help_text": "The output directory where the results will be saved."
+                }
+            }
+        },
+        "resource_options": {
+            "title": "Resource Options",
+            "type": "object",
+            "description": "Options for maximum resource limits",
+            "properties": {
+                "max_cpus": {
+                    "type": "integer",
+                    "description": "Maximum number of CPUs",
+                    "default": 16,
+                    "minimum": 1
+                },
+                "max_memory": {
+                    "type": "string",
+                    "description": "Maximum memory",
+                    "default": "64.GB",
+                    "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$"
+                },
+                "max_time": {
+                    "type": "string",
+                    "description": "Maximum time per task",
+                    "default": "24.h",
+                    "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(s|m|h|d)$"
+                }
+            }
+        }
+    },
+    "allOf": [
+        {
+            "$ref": "#/definitions/input_output_options"
+        },
+        {
+            "$ref": "#/definitions/resource_options"
+        }
+    ]
+}
