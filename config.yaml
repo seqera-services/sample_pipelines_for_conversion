@@ -1,0 +1,19 @@
+# Snakemake RNA-seq Pipeline Configuration
+
+# Sample information
+sample_name: "sample1"
+
+# Input files (gzipped FASTQ)
+read1: "test_data/reads/sample1_R1.fastq.gz"
+read2: "test_data/reads/sample1_R2.fastq.gz"
+
+# Reference files
+star_index: "test_data/reference/star_index"
+annotation: "test_data/reference/annotation.gtf"
+
+# Output directory
+outdir: "results"
+
+# Processing options
+threads: 4
+skip_fastqc: false
