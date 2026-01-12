@@ -16,27 +16,26 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Set up Conda
-      uses: conda-incubator/setup-miniconda@v3
+    - name: Set up Python
+      uses: actions/setup-python@v5
       with:
-        auto-update-conda: true
-        python-version: 3.9
-        channels: conda-forge,bioconda,defaults
-        channel-priority: strict
-        mamba-version: "*"
-        use-mamba: true
+        python-version: '3.9'
 
-    - name: Install bioinformatics tools via mamba
-      shell: bash -el {0}
+    - name: Install system dependencies and tools
       run: |
-        # Use mamba for faster dependency resolution
-        # Install ncurses to fix libncurses.so.5 dependency
-        mamba install -y -c bioconda -c conda-forge \
-          fastqc \
-          star \
-          samtools \
-          subread \
-          ncurses
+        sudo apt-get update
+        sudo apt-get install -y wget default-jre fastqc samtools
+
+        # Install STAR
+        cd /tmp
+        wget -q https://github.com/alexdobin/STAR/archive/2.7.10b.tar.gz
+        tar -xzf 2.7.10b.tar.gz
+        sudo cp STAR-2.7.10b/bin/Linux_x86_64/STAR /usr/local/bin/
+
+        # Install subread (featureCounts)
+        wget -q https://sourceforge.net/projects/subread/files/subread-2.0.3/subread-2.0.3-Linux-x86_64.tar.gz
+        tar -xzf subread-2.0.3-Linux-x86_64.tar.gz
+        sudo cp subread-2.0.3-Linux-x86_64/bin/featureCounts /usr/local/bin/
 
         # Verify installations
         fastqc --version
@@ -82,7 +81,6 @@ jobs:
         head -5 annotation.gtf
 
     - name: Build STAR index
-      shell: bash -el {0}
       run: |
         cd test_data/reference
         mkdir star_index
@@ -102,7 +100,6 @@ jobs:
         rm genome.fa
 
     - name: Run Python pipeline
-      shell: bash -el {0}
       run: |
         python rnaseq_pipeline.py \
           --read1 test_data/reads/sample1_R1.fastq.gz \
