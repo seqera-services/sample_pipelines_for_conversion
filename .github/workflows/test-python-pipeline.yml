@@ -23,16 +23,20 @@ jobs:
         python-version: 3.9
         channels: conda-forge,bioconda,defaults
         channel-priority: strict
+        mamba-version: "*"
+        use-mamba: true
 
-    - name: Install bioinformatics tools via conda
+    - name: Install bioinformatics tools via mamba
       shell: bash -el {0}
       run: |
-        # Install without strict version pins to avoid dependency conflicts
-        conda install -y -c bioconda -c conda-forge \
+        # Use mamba for faster dependency resolution
+        # Install ncurses to fix libncurses.so.5 dependency
+        mamba install -y -c bioconda -c conda-forge \
           fastqc \
           star \
           samtools \
-          subread
+          subread \
+          ncurses
 
         # Verify installations
         fastqc --version
