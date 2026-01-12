@@ -1,0 +1,26 @@
+# RNA-seq Pipeline Configuration
+# Edit this file to customize pipeline parameters
+
+# Sample information
+sample_name: "sample1"
+
+# Input files
+reads:
+  read1: "test_data/reads/sample1_R1.fastq.gz"
+  read2: "test_data/reads/sample1_R2.fastq.gz"
+
+# Reference files
+reference:
+  star_index: "test_data/reference/star_index"
+  annotation_gtf: "test_data/reference/annotation.gtf"
+
+# Output settings
+output_dir: "results"
+
+# Resource settings
+threads: 4
+
+# Pipeline steps (set to false to skip)
+run_fastqc: true
+run_star: true
+run_featurecounts: true
