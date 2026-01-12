@@ -1,0 +1,9 @@
+{
+  "RNAseq.read1": "test_data/reads/sample1_R1.fastq.gz",
+  "RNAseq.read2": "test_data/reads/sample1_R2.fastq.gz",
+  "RNAseq.sample_name": "sample1",
+  "RNAseq.star_index_tar": "test_data/reference/star_index.tar.gz",
+  "RNAseq.annotation_gtf": "test_data/reference/annotation.gtf",
+  "RNAseq.threads": 4,
+  "RNAseq.memory": "8G"
+}
