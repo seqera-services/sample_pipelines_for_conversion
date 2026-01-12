@@ -27,11 +27,12 @@ jobs:
     - name: Install bioinformatics tools via conda
       shell: bash -el {0}
       run: |
+        # Install without strict version pins to avoid dependency conflicts
         conda install -y -c bioconda -c conda-forge \
-          fastqc=0.11.9 \
-          star=2.7.10a \
-          samtools=1.15 \
-          subread=2.0.3
+          fastqc \
+          star \
+          samtools \
+          subread
 
         # Verify installations
         fastqc --version
@@ -51,21 +52,23 @@ jobs:
     - name: Download minimal test reads
       run: |
         cd test_data/reads
-        # Download tiny test files from nf-core test datasets
-        wget -q https://raw.githubusercontent.com/nf-core/test-datasets/rnaseq/testdata/SRR4238351_subsamp_1.fastq.gz -O sample1_R1.fastq.gz
-        wget -q https://raw.githubusercontent.com/nf-core/test-datasets/rnaseq/testdata/SRR4238351_subsamp_2.fastq.gz -O sample1_R2.fastq.gz
+        # Use stable URLs from nf-core test-datasets repo
+        wget -q "https://github.com/nf-core/test-datasets/raw/rnaseq/testdata/GSE110004/SRR6357070_1.fastq.gz" -O sample1_R1.fastq.gz
+        wget -q "https://github.com/nf-core/test-datasets/raw/rnaseq/testdata/GSE110004/SRR6357070_2.fastq.gz" -O sample1_R2.fastq.gz
 
         # Verify downloads
         ls -lh
         gunzip -t sample1_R1.fastq.gz
         gunzip -t sample1_R2.fastq.gz
 
+        echo "Downloaded $(zcat sample1_R1.fastq.gz | wc -l | awk '{print $1/4}') read pairs"
+
     - name: Download reference genome and annotation
       run: |
         cd test_data/reference
-        # Download minimal reference files
-        wget -q https://raw.githubusercontent.com/nf-core/test-datasets/rnaseq/reference/genome.fa
-        wget -q https://raw.githubusercontent.com/nf-core/test-datasets/rnaseq/reference/genes.gtf.gz
+        # Download minimal reference files from nf-core test-datasets
+        wget -q "https://github.com/nf-core/test-datasets/raw/rnaseq/reference/genome.fa" -O genome.fa
+        wget -q "https://github.com/nf-core/test-datasets/raw/rnaseq/reference/genes.gtf.gz" -O genes.gtf.gz
         gunzip genes.gtf.gz
         mv genes.gtf annotation.gtf
 
