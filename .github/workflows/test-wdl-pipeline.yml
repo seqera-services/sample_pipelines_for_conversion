@@ -1,0 +1,134 @@
+name: Test WDL RNA-seq Pipeline
+
+on:
+  push:
+    branches: [ wdl ]
+  pull_request:
+    branches: [ wdl ]
+  workflow_dispatch:
+
+jobs:
+  test-pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install miniWDL
+      run: |
+        pip install miniwdl
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Pull required Docker images
+      run: |
+        docker pull biocontainers/fastqc:v0.11.9_cv8
+        docker pull quay.io/biocontainers/mulled-v2-1fa26d1ce03c295fe2fdcf85831a92fbcbd7e8c2:1df389393721fc66f3fd8778ad938ac711951107-0
+        docker pull quay.io/biocontainers/subread:2.0.1--hed695b0_0
+
+    - name: Create test data directories
+      run: |
+        mkdir -p test_data/reads
+        mkdir -p test_data/reference
+
+    - name: Download minimal test reads
+      run: |
+        cd test_data/reads
+        # Download tiny test files from nf-core test datasets
+        wget -q https://raw.githubusercontent.com/nf-core/test-datasets/rnaseq/testdata/SRR4238351_subsamp_1.fastq.gz -O sample1_R1.fastq.gz
+        wget -q https://raw.githubusercontent.com/nf-core/test-datasets/rnaseq/testdata/SRR4238351_subsamp_2.fastq.gz -O sample1_R2.fastq.gz
+
+        # Verify downloads
+        ls -lh
+        gunzip -t sample1_R1.fastq.gz
+        gunzip -t sample1_R2.fastq.gz
+
+    - name: Download reference genome and annotation
+      run: |
+        cd test_data/reference
+        # Download minimal reference files
+        wget -q https://raw.githubusercontent.com/nf-core/test-datasets/rnaseq/reference/genome.fa
+        wget -q https://raw.githubusercontent.com/nf-core/test-datasets/rnaseq/reference/genes.gtf.gz
+        gunzip genes.gtf.gz
+        mv genes.gtf annotation.gtf
+
+        # Verify downloads
+        ls -lh
+        head -5 genome.fa
+        head -5 annotation.gtf
+
+    - name: Install STAR for index generation
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y wget
+
+        # Download and install STAR
+        cd /tmp
+        wget -q https://github.com/alexdobin/STAR/archive/2.7.10a.tar.gz
+        tar -xzf 2.7.10a.tar.gz
+        sudo cp STAR-2.7.10a/bin/Linux_x86_64/STAR /usr/local/bin/
+        STAR --version
+
+    - name: Build STAR index
+      run: |
+        cd test_data/reference
+        mkdir star_index_temp
+
+        STAR --runMode genomeGenerate \
+          --genomeDir star_index_temp \
+          --genomeFastaFiles genome.fa \
+          --sjdbGTFfile annotation.gtf \
+          --sjdbOverhang 99 \
+          --genomeSAindexNbases 10 \
+          --runThreadN 2
+
+        # Package the index as tarball
+        tar -czf star_index.tar.gz -C star_index_temp .
+
+        # Verify tarball
+        tar -tzf star_index.tar.gz | head -10
+
+        # Clean up
+        rm -rf star_index_temp genome.fa
+
+    - name: Verify WDL syntax
+      run: |
+        miniwdl check rnaseq.wdl
+
+    - name: Run WDL pipeline with miniWDL
+      run: |
+        miniwdl run rnaseq.wdl \
+          -i inputs.json \
+          --verbose \
+          --dir miniwdl_run
+
+    - name: Check outputs
+      run: |
+        echo "=== Checking pipeline outputs ==="
+
+        # Find the output directory (miniWDL creates timestamped directories)
+        OUTPUT_DIR=$(find miniwdl_run -type d -name "call-*" | head -1)
+        echo "Output directory: $OUTPUT_DIR"
+
+        # List all outputs
+        find miniwdl_run -type f -name "*.html" -o -name "*.bam" -o -name "*.txt" | sort
+
+        echo "=== Pipeline test completed successfully ==="
+
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: wdl-pipeline-results
+        path: |
+          miniwdl_run/
+          !miniwdl_run/**/*.bam
+        retention-days: 7
