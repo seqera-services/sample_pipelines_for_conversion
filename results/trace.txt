@@ -1,0 +1,6 @@
+task_id	hash	native_id	name	status	exit	submit	duration	realtime	%cpu	peak_rss	peak_vmem	rchar	wchar
+2	5a/55be1d	1598	STAR_ALIGN (yeast_test)	COMPLETED	0	2026-05-29 16:17:42.331	26.4s	26.4s	99.5%	233.4 MB	453.7 MB	59.9 MB	31.4 MB
+1	91/6ec84d	3056	FASTQC (yeast_test_R1)	COMPLETED	0	2026-05-29 16:18:08.756	2.4s	2.2s	126.5%	243.5 MB	3.5 GB	12 MB	1.8 MB
+3	80/1fdfb7	3289	FASTQC (yeast_test_R2)	COMPLETED	0	2026-05-29 16:18:11.164	2.2s	2.2s	144.2%	148 MB	3.6 GB	11.8 MB	1.8 MB
+4	59/2a7b1f	3472	SAMTOOLS_INDEX (yeast_test)	COMPLETED	0	2026-05-29 16:18:13.394	66ms	32ms	133.3%	4.5 MB	10.7 MB	4.1 MB	2.1 KB
+5	31/8e3890	3580	FEATURECOUNTS (yeast_test)	COMPLETED	0	2026-05-29 16:18:13.494	144ms	109ms	81.8%	11.4 MB	309.3 MB	4.4 MB	8.5 KB

@@ -1,0 +1,8 @@
+	STAR --runThreadN 2 --genomeDir star_index --readFilesIn sample1_R1.fastq.gz sample1_R2.fastq.gz --readFilesCommand zcat --outFileNamePrefix yeast_test. --outSAMtype BAM SortedByCoordinate --outSAMunmapped Within --outSAMattributes Standard
+	STAR version: 2.7.11b   compiled: 2025-04-26T21:36:33+0000 :/opt/conda/conda-bld/star_1745703267088/work/source
+May 29 16:17:42 ..... started STAR run
+May 29 16:17:42 ..... loading genome
+May 29 16:17:42 ..... started mapping
+May 29 16:18:08 ..... finished mapping
+May 29 16:18:08 ..... started sorting BAM
+May 29 16:18:08 ..... finished successfully
