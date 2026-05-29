@@ -12,6 +12,7 @@
 process FASTQC {
     tag "${sample_name}_${read_label}"
     publishDir "${params.outdir}/fastqc", mode: 'copy'
+    conda 'bioconda::fastqc=0.12.1'
 
     input:
     tuple val(sample_name), val(read_label), path(reads)
@@ -37,6 +38,7 @@ process FASTQC {
 process STAR_ALIGN {
     tag "${sample_name}"
     publishDir "${params.outdir}/star", mode: 'copy'
+    conda 'bioconda::star=2.7.11b'
 
     input:
     tuple val(sample_name), path(read1), path(read2)
@@ -66,6 +68,7 @@ process STAR_ALIGN {
 process SAMTOOLS_INDEX {
     tag "${sample_name}"
     publishDir "${params.outdir}/star", mode: 'copy'
+    conda 'bioconda::samtools=1.23.1'
 
     input:
     tuple val(sample_name), path(bam)
@@ -85,6 +88,7 @@ process SAMTOOLS_INDEX {
 process FEATURECOUNTS {
     tag "${sample_name}"
     publishDir "${params.outdir}/counts", mode: 'copy'
+    conda 'bioconda::subread=2.1.1'
 
     input:
     tuple val(sample_name), path(bam), path(bai)
