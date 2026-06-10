@@ -1,109 +1,76 @@
-# Sample RNA-seq Pipelines for Conversion
+# RNA-seq Pipeline (Nextflow DSL2)
 
-This repository contains sample RNA-seq analysis pipelines implemented in different languages, designed for demonstration purposes with Seqera AI for pipeline conversion to Nextflow.
+A minimal RNA-seq analysis pipeline converted from a Python script to idiomatic Nextflow DSL2.
 
-## Repository Structure
+## Pipeline Steps
 
-This repository has **six branches**, each containing a minimal RNA-seq pipeline in a different language:
-
-- **`wdl`** - Workflow Description Language (WDL) implementation
-- **`r`** - R-based pipeline
-- **`python`** - Python-based pipeline
-- **`bash`** - Bash shell script pipeline
-- **`nextflow`** - Nextflow DSL2 implementation (without unit tests)
-- **`snakemake`** - Snakemake workflow implementation
-
-## Pipeline Overview
-
-Each pipeline implements a minimal RNA-seq workflow with three main steps:
-
-1. **Quality Control** - FastQC analysis of raw reads
-2. **Alignment** - STAR alignment to reference genome
-3. **Quantification** - Feature counting with featureCounts (subread)
-
-## Test Dataset
-
-The pipelines are designed to work with minimal test data for quick demonstrations. We recommend using:
-
-### Option 1: Minimal Test Data (Recommended for Demos)
-- **Reads**: Subsampled FASTQ files (10,000 reads)
-- **Reference**: Single chromosome or small genome subset
-- **Location**: `test_data/` directory (to be created in each branch)
-
-### Option 2: Standard Test Data
-- **Reference Genome**: Human chromosome 22 or yeast genome
-- **Reads**: Public RNA-seq data from SRA (e.g., SRR1039508 - airway smooth muscle cells)
-- Can be downloaded using:
-  ```bash
-  # Using SRA Toolkit
-  fastq-dump --split-files --gzip SRR1039508
-  ```
-
-### Data Structure
-Each branch will include a `test_data/` directory structure:
-```
-test_data/
-├── reads/
-│   ├── sample1_R1.fastq.gz
-│   └── sample1_R2.fastq.gz
-├── reference/
-│   ├── genome.fa
-│   └── annotation.gtf
-└── README.md (download instructions)
-```
-
-## Using This Repository
-
-### For Demonstrations
-1. Clone the repository
-2. Checkout the branch for the language you want to demonstrate
-3. Follow the instructions in that branch's README to:
-   - Download/prepare test data
-   - Install dependencies
-   - Run the pipeline
-
-### For Conversion Practice
-Use Seqera AI to convert pipelines from any branch to Nextflow:
-1. Checkout a non-Nextflow branch
-2. Use Seqera AI to analyze and convert the pipeline
-3. Compare with the reference Nextflow implementation
+1. **FastQC** — Quality control of raw FASTQ reads
+2. **STAR** — Spliced alignment to reference genome
+3. **samtools index** — Index sorted BAM files
+4. **featureCounts** — Gene-level read quantification
 
 ## Quick Start
 
 ```bash
-# Clone the repository
-git clone <repository-url>
-cd sample_pipelines_for_conversion
+# Single sample (direct params)
+nextflow run main.nf \
+    -profile docker \
+    --read1 data/sample1_R1.fastq.gz \
+    --read2 data/sample1_R2.fastq.gz \
+    --star_index references/star_index \
+    --gtf references/annotation.gtf \
+    --outdir results
 
-# List all branches
-git branch -a
-
-# Checkout a specific pipeline
-git checkout wdl        # For WDL pipeline
-git checkout python     # For Python pipeline
-git checkout snakemake  # For Snakemake pipeline
-# etc.
+# Multiple samples (sample sheet)
+nextflow run main.nf \
+    -profile docker \
+    --input samplesheet.csv \
+    --star_index references/star_index \
+    --gtf references/annotation.gtf \
+    --outdir results
 ```
+
+## Parameters
+
+| Parameter      | Description                          | Default   |
+|---------------|--------------------------------------|-----------|
+| `--input`     | Path to sample sheet (CSV)           | null      |
+| `--read1`     | Path to R1 FASTQ (single sample)     | null      |
+| `--read2`     | Path to R2 FASTQ (single sample)     | null      |
+| `--sample_name` | Sample identifier                  | sample1   |
+| `--star_index` | STAR genome index directory         | null      |
+| `--gtf`       | GTF annotation file                  | null      |
+| `--outdir`    | Output directory                     | results   |
+| `--skip_fastqc` | Skip FastQC step                   | false     |
+
+## Profiles
+
+- `docker` — Run with Docker containers
+- `singularity` — Run with Singularity containers
+- `conda` — Run with Conda environments
+- `wave` — Run with Seqera Wave containers
+- `test` — Run with bundled test data
+
+## Output Structure
+
+```
+results/
+├── fastqc/          # FastQC reports (HTML + ZIP)
+├── star/            # STAR alignments (BAM + BAI + logs)
+├── counts/          # featureCounts gene counts
+└── pipeline_info/   # Nextflow execution reports
+```
+
+## Software Versions
+
+| Tool         | Version  |
+|-------------|----------|
+| FastQC      | 0.12.1   |
+| STAR        | 2.7.11b  |
+| samtools    | 1.23.1   |
+| subread     | 2.1.1    |
 
 ## Requirements
 
-Each branch includes its own:
-- README with specific installation instructions
-- Dependency list (conda environment, Docker container, or manual installation)
-- Example run commands
-- Expected outputs
-
-## Notes
-
-- All pipelines perform the same analysis steps for consistency
-- The Nextflow branch intentionally excludes unit tests to keep it simple for demo purposes
-- Each implementation follows best practices for its respective language/framework
-- Test data is deliberately minimal to enable quick demo runs (< 5 minutes)
-
-## Contributing
-
-This repository is designed for demonstration purposes. If you'd like to suggest improvements or report issues, please open an issue or pull request.
-
-## License
-
-[Add appropriate license]
+- Nextflow >= 23.04.0
+- Docker, Singularity, or Conda
