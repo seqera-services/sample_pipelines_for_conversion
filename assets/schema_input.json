@@ -1,0 +1,31 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "RNA-seq pipeline - samplesheet schema",
+    "description": "Schema for the samplesheet used as input to the RNA-seq pipeline",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "sample": {
+                "type": "string",
+                "description": "Sample identifier. Must be unique.",
+                "pattern": "^\\S+$"
+            },
+            "fastq_1": {
+                "type": "string",
+                "description": "Path to the R1 FASTQ file (gzipped).",
+                "pattern": "^\\S+\\.f(ast)?q\\.gz$",
+                "format": "file-path",
+                "exists": true
+            },
+            "fastq_2": {
+                "type": "string",
+                "description": "Path to the R2 FASTQ file (gzipped).",
+                "pattern": "^\\S+\\.f(ast)?q\\.gz$",
+                "format": "file-path",
+                "exists": true
+            }
+        },
+        "required": ["sample", "fastq_1", "fastq_2"]
+    }
+}
