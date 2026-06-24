@@ -1,2 +1,0 @@
-2026-06-24 14:47:06	-	extravagant_thompson	-	0a4bfa752fb47fbd77b291ccb4549df2	5aefd921-083b-4c7d-a1f6-f46bb94d8554	nextflow run main.nf -preview
-2026-06-24 14:47:17	2.5s	modest_plateau	OK	0a4bfa752fb47fbd77b291ccb4549df2	7a37d6a6-d62b-4f35-8c52-5bb4f6dd5949	nextflow run main.nf -preview --reads 'test/*_{R1,R2}.fq.gz' --star_index test_index --gtf test.gtf
