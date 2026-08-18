@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/seqera-services/sample_pipelines_for_conversion/nextflow/nextflow_schema.json",
+  "title": "RNA-seq Pipeline parameters",
+  "description": "Minimal RNA-seq analysis pipeline: FastQC -> STAR alignment -> featureCounts",
+  "type": "object",
+  "$defs": {
+    "input_output_options": {
+      "title": "Input/output options",
+      "type": "object",
+      "fa_icon": "fas fa-terminal",
+      "description": "Define where the pipeline should find input data and save output data.",
+      "required": ["read1", "read2"],
+      "properties": {
+        "read1": {
+          "type": "string",
+          "format": "file-path",
+          "exists": true,
+          "pattern": "^\\S+\\.f(ast)?q\\.gz$",
+          "description": "Path to read 1 FASTQ file (gzipped).",
+          "fa_icon": "fas fa-file"
+        },
+        "read2": {
+          "type": "string",
+          "format": "file-path",
+          "exists": true,
+          "pattern": "^\\S+\\.f(ast)?q\\.gz$",
+          "description": "Path to read 2 FASTQ file (gzipped).",
+          "fa_icon": "fas fa-file"
+        },
+        "sample_name": {
+          "type": "string",
+          "default": "sample1",
+          "description": "Name of the sample used for output file prefixes.",
+          "fa_icon": "fas fa-tag"
+        },
+        "outdir": {
+          "type": "string",
+          "format": "directory-path",
+          "default": "results",
+          "description": "Output directory for pipeline results.",
+          "fa_icon": "fas fa-folder-open"
+        }
+      }
+    },
+    "reference_options": {
+      "title": "Reference genome options",
+      "type": "object",
+      "fa_icon": "fas fa-dna",
+      "description": "Paths to reference genome index and annotation.",
+      "required": ["star_index", "annotation"],
+      "properties": {
+        "star_index": {
+          "type": "string",
+          "format": "directory-path",
+          "exists": true,
+          "description": "Path to the STAR genome index directory.",
+          "fa_icon": "fas fa-dna"
+        },
+        "annotation": {
+          "type": "string",
+          "format": "file-path",
+          "exists": true,
+          "pattern": "^\\S+\\.gtf(\\.gz)?$",
+          "description": "Path to the GTF gene annotation file.",
+          "fa_icon": "fas fa-file-alt"
+        }
+      }
+    },
+    "process_options": {
+      "title": "Process options",
+      "type": "object",
+      "fa_icon": "fas fa-cog",
+      "description": "Options controlling pipeline execution behavior.",
+      "properties": {
+        "threads": {
+          "type": "integer",
+          "default": 4,
+          "minimum": 1,
+          "description": "Number of threads for STAR alignment and featureCounts.",
+          "fa_icon": "fas fa-microchip"
+        },
+        "skip_fastqc": {
+          "type": "boolean",
+          "default": false,
+          "description": "Skip the FastQC quality control step.",
+          "fa_icon": "fas fa-toggle-on"
+        }
+      }
+    },
+    "generic_options": {
+      "title": "Generic options",
+      "type": "object",
+      "fa_icon": "fas fa-file-import",
+      "description": "Less common options for the pipeline.",
+      "properties": {
+        "help": {
+          "type": "boolean",
+          "default": false,
+          "hidden": true,
+          "description": "Display help message.",
+          "fa_icon": "fas fa-question-circle"
+        }
+      }
+    }
+  },
+  "allOf": [
+    { "$ref": "#/$defs/input_output_options" },
+    { "$ref": "#/$defs/reference_options" },
+    { "$ref": "#/$defs/process_options" },
+    { "$ref": "#/$defs/generic_options" }
+  ]
+}
